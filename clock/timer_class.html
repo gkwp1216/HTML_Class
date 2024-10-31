@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clock</title>
+</head>
+<style>
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+</style>
+<body>
+    
+    <div class="container">
+        <h1>타이머 설정</h1>
+        <label><input type="number" id="minInput" placeholder="0" min="0">분</label>
+        <label><input type="number" id="secInput" placeholder="0" min="0">초</label>
+        <br>
+    
+        <button class="start-btn">시작</button>
+        <button class="pause-btn">일시정지</button>
+        <button class="resume-btn">재시작</button>
+        <button class="reset-btn">리셋</button>
+
+        <div id="timer-display">남은 시간 00 : 00</div>
+    </div>
+    <audio id="alarm" src="99412B355CF6B93806.mp3"></audio>
+
+    <script>
+        let timerInterval;
+        let seconds = 0;
+        //변수 선언
+        //버튼 요소 가져오기
+        //각 버튼에 이벤트 요소 추가
+        //타이머 함수 시작
+        //타이머 시작
+        //타이머 일시 정지
+        //타이머 재시작
+        //타이머 리셋
+        //남은 시간 업데이트
+        //종료음 재생
+        function alarm() {
+            document.querySelector('#alarm').play();
+        }
+    </script>
+</body>
+</html>
