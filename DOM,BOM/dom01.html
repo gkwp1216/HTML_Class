@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DOM</title>
+</head>
+<body>
+    <h1 id = 'title' class = 'subject'>제목</h1>
+    <p>자바스크립트 굉장히 어렵습니다</p>
+    <ul>
+        <li>DOM</li>
+        <li>BOM</li>
+        <li>JAVASCRIPT</li>
+    </ul>
+    <script>
+        //document.querySelector('h1').textContent = 'asdf'
+        //document.querySelector('#title').textContent = 'qwer'
+        //document.querySelector('.subject').textContent = 'zxcv'
+        //document.getElementById('title').textContent = 'qqq'
+
+        const h1Element = document.querySelector('h1')
+        h1Element.textContent = 'www'           //이 형태를 가장 많이 사용한다
+
+        document.querySelector('li').textContent = 'D O M' // 여러개 중 첫 번째를 선택한다
+        const qALL = document.querySelectorAll('li')
+        console.log(qALL)
+
+        document.querySelectorAll('li')[1].textContent = 'B O M' //배열을 사용하여 여러개 중 하나를 선택
+    </script>
+</body>
+</html>
