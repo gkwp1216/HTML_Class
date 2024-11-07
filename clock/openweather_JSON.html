@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Open Weather</title>
+</head>
+<body>
+    <h1>현재 날씨</h1>
+    <div id="weather">날씨 정보 불러오는 중 ... </div>
+
+    <script>
+        function getweather(){
+            const url = 'https://api.openweathermap.org/data/2.5/weather?lat=44.34&lon=10.99&appid={4bf7ba97cc9180ac02c0a27686d331b5}';
+            //http://api.openweathermap.org/geo/1.0/direct?q={city name},{state code},{country code}&limit={limit}&appid={API key}
+       
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                const temperature = data.main.temp;
+                const description = data.weather[0].description;
+                const city = data.name;
+
+                document.querySelector('#weather').innerHTML =`
+                    <p>도시 : ${city} </p>
+                    <p>현재 온도 : ${temperature}°C </p>
+                    <p>도시 : ${city} </p>
+
+                    `;
+            })
+
+            .catch(error => {
+                document.querySelector('#weather').innerHTML = '날씨를 가져오는 도중 오류가 발생했습니다.'
+                console.error('오류',error);
+            })
+        }
+            getweather();
+    </script>
+</body>
+</html>

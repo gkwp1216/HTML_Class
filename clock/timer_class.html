@@ -1,25 +1,44 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Clock</title>
+    <title>타이머</title>
 </head>
 <style>
     body {
         display: flex;
         justify-content: center;
         align-items: center;
+        height: 30vh;
+    }
+    h1 {
+        justify-content: center;
+        text-align: center;
+    }
+    .container {
+        border: 5px solid #f5d0e2;  
+        border-radius: 25px;
+    }
+    #timer-display {
+        justify-content: center;
+        text-align: center;
     }
 </style>
+
 <body>
-    
     <div class="container">
-        <h1>타이머 설정</h1>
+        <h1>타이머</h1>
         <label><input type="number" id="minInput" placeholder="0" min="0">분</label>
         <label><input type="number" id="secInput" placeholder="0" min="0">초</label>
         <br>
-    
+        <button onclick="addTime(1, 0)">1분 추가</button>
+        <button onclick="addTime(5, 0)">5분 추가</button>
+        <button onclick="addTime(10, 0)">10분 추가</button>
+        <button onclick="addTime(0, 10)">10초 추가</button>
+        <button onclick="addTime(0, 30)">30초 추가</button>
+        <br>
         <button class="start-btn">시작</button>
         <button class="pause-btn">일시정지</button>
         <button class="resume-btn">재시작</button>
@@ -30,21 +49,119 @@
     <audio id="alarm" src="99412B355CF6B93806.mp3"></audio>
 
     <script>
+        //변수 선언
         let timerInterval;
         let seconds = 0;
-        //변수 선언
+        let totalsec = 0;
+        let remainsec = 0;
+        let IntervalID;
+        let isRunning = false;
+        let isPause = false;
+
         //버튼 요소 가져오기
+        const startbtn = document.querySelector('.start-btn');
+        const pausebtn = document.querySelector('.pause-btn');
+        const resumebtn = document.querySelector('.resume-btn');
+        const resetbtn = document.querySelector('.reset-btn');
+
         //각 버튼에 이벤트 요소 추가
+        startbtn.addEventListener('click', starttimer);
+        pausebtn.addEventListener('click', pausetimer);
+        resumebtn.addEventListener('click', resumetimer);
+        resetbtn.addEventListener('click', resettimer);
+
+        // 시간 추가 함수
+        function addTime(minToAdd, secToAdd) {
+            // 입력 필드 값 가져오기
+            const minInput = document.querySelector('#minInput');
+            const secInput = document.querySelector('#secInput');
+
+            // 현재 값에 추가할 시간 더하기
+            let currentMin = parseInt(minInput.value) || 0;
+            let currentSec = parseInt(secInput.value) || 0;
+
+            // 초가 60 이상일 경우, 분으로 변환
+            currentSec += secToAdd;
+            if (currentSec >= 60) {
+                currentMin += Math.floor(currentSec / 60);
+                currentSec = currentSec % 60;
+            }
+
+            // 분 추가
+            currentMin += minToAdd;
+
+            minInput.value = currentMin;
+            secInput.value = currentSec;
+        }
+
         //타이머 함수 시작
-        //타이머 시작
+        function starttimer() {
+            if (isRunning) return;
+
+            const min = parseInt(document.querySelector('#minInput').value) || 0;
+            const sec = parseInt(document.querySelector('#secInput').value) || 0;
+            
+            //유효한 숫자가 입력되었는지 확인 (음수 or 0 처리)
+            if(min < 0 || sec < 0 || min == 0 && sec == 0){
+                alert('유효한 시간을 입력하십시오');
+                return;
+            }
+
+            totalsec = min * 60 + sec;
+            remainsec = totalsec;
+            timeupdate();
+
+            //타이머 시작
+            IntervalID = setInterval(() => {
+
+                if (!isPause) {
+                    remainsec--;
+                    timeupdate();
+                }
+                if (remainsec <= 0) {
+                    clearInterval(IntervalID); // 시간이 끝나면 타이머 중지
+                    alarm();
+                    document.querySelector('#timer-display').textContent = '종료'
+                    //isRunning = true;
+                    alert("타이머가 종료되었습니다!"); // 타이머 종료 메시지
+                }
+            }, 1000);
+
+            //clearInterval(IntervalID);
+        }
+
         //타이머 일시 정지
+        function pausetimer() {
+            isPause = true;
+
+            //alert("타이머가 일시 정지되었습니다."); // 정지 메시지
+        }
         //타이머 재시작
+        function resumetimer() {
+            isPause = false;
+        }
         //타이머 리셋
+        function resettimer() {
+            clearInterval(IntervalID);
+            totalsec = 0;
+            remainsec = 0;
+            isPause = false;
+            document.querySelector('#timer-display').textContent = '남은 시간 00 : 00 '
+            document.querySelector('#minInput').value = '';
+            document.querySelector('#secInput').value = '';
+        }
         //남은 시간 업데이트
+        function timeupdate() {
+            const display_min = Math.floor(remainsec / 60).toString().padStart(2, '0');
+            const display_sec = (remainsec % 60).toString().padStart(2, '0');
+            document.querySelector('#timer-display').textContent = `남은 시간 ${display_min} : ${display_sec}`             //innerHTML 
+        }
+
         //종료음 재생
         function alarm() {
             document.querySelector('#alarm').play();
         }
     </script>
 </body>
+
 </html>

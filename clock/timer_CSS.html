@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>타이머</title>
+    <style>
+        /* 진행 상태바, 배경&버튼 색상 선택 , 남은시간 1분,30초 단위마다 점멸, 남은시간 10초 이하일 때 점멸*/
+        /* 기본 스타일 초기화 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* 배경 설정 */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        /* 타이머 컨테이너 스타일 */
+        .container {
+            background-color: #ffffff;
+            border: 2px solid #e0e0e0;
+            border-radius: 20px;
+            padding: 30px;
+            width: 500px;
+            max-width: 90%;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        /* 타이머 제목 */
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: #4a4a4a;
+        }
+
+        /* 입력 필드 스타일 */
+        input[type="number"] {
+            width: 50px;
+            padding: 8px;
+            margin: 0 5px;
+            font-size: 1.2rem;
+            text-align: center;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            outline: none;
+        }
+
+        input[type="number"]:focus {
+            border-color: #88c0d0;
+        }
+
+        label {
+            font-size: 1rem;
+            color: #333;
+        }
+
+        /* 버튼 스타일 */
+        button {
+            background-color: #88c0d0;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            margin: 10px 5px;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-width: 120px;
+        }
+
+        button:hover {
+            background-color: #5e8f9b;
+        }
+
+        button:active {
+            background-color: #4e7f8b;
+        }
+
+        /* 타이머 표시 부분 */
+        #timer-display {
+            font-size: 2.5rem;
+            margin-top: 20px;
+            font-weight: bold;
+            color: #4a90e2;
+        }
+
+        /* 추가 버튼들을 정렬 */
+        .button-group {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        /* 시간 추가 버튼들을 정렬 */
+        .button-group-addtime {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            /* 3개의 열로 나누기 */
+            gap: 10px;
+            /* 버튼 간의 간격 설정 */
+            margin-top: 20px;
+            justify-items: center;
+            /* 버튼을 가운데 정렬 */
+        }
+
+        .button-group-control {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            /* 2개의 열로 나누기 */
+            gap: 10px;
+            /* 버튼 간의 간격 설정 */
+            margin-top: 20px;
+            justify-items: center;
+            /* 버튼을 가운데 정렬 */
+        }
+
+        @keyframes blink {
+            0% {
+                color: red;
+                opacity: 1;
+
+            }
+
+            50% {
+                color: transparent;
+                opacity: 0;
+            }
+
+            100% {
+                color: red;
+                opacity: 1;
+            }
+        }
+
+        .blink {
+            animation: blink 1s infinite;
+        }
+
+        /* ================================================================*/
+        @keyframes progressBar {
+            0% {
+                width: 0;
+            }
+
+            100% {
+                width: 100%;
+            }
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: #4a90e2;
+            width: 0%;  /* 애니메이션을 통해 바뀌게 됩니다 */
+            transition: width 1s linear;
+        }
+    </style>
+</head>
+
+<body>
+    <label for="bgColor">배경 색상:</label>
+    <input type="color" id="bgColor" name="bgColor" value="#f4f4f9">
+    <label for="btnColor">버튼 색상:</label>
+    <input type="color" id="btnColor" name="btnColor" value="#88c0d0">
+
+    <div class="container">
+        <h1>타이머</h1>
+        <label><input type="number" id="minInput" placeholder="0" min="0">분</label>
+        <label><input type="number" id="secInput" placeholder="0" min="0">초</label>
+        <!-- 남은시간 상태바 -->
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        <!-- 시간 추가 버튼 -->
+        <div class="button-group-addtime">
+            <button onclick="addTime(1, 0)">1분 추가</button>
+            <button onclick="addTime(5, 0)">5분 추가</button>
+            <button onclick="addTime(10, 0)">10분 추가</button>
+            <button onclick="addTime(0, 5)">5초 추가</button>
+            <button onclick="addTime(0, 10)">10초 추가</button>
+            <button onclick="addTime(0, 30)">30초 추가</button>
+        </div>
+
+        <!-- 타이머 제어 버튼 -->
+        <div class="button-group-control">
+            <button class="start-btn">시작▶</button>
+            <button class="pause-btn">일시정지❚❚</button>
+            <button class="resume-btn">재시작▷</button>
+            <button class="reset-btn">리셋↻</button>
+        </div>
+
+        <!-- 타이머 남은 시간 표시 -->
+        <div id="timer-display">남은 시간 00 : 00</div>
+    </div>
+
+    <audio id="alarm" src="99412B355CF6B93806.mp3"></audio>
+
+    <script>
+        // 변수 선언
+        let timerInterval;
+        let seconds = 0;
+        let totalsec = 0;
+        let remainsec = 0;
+        let IntervalID;
+        let isRunning = false;
+        let isPause = false;
+
+        // 버튼 요소 가져오기
+        const startbtn = document.querySelector('.start-btn');
+        const pausebtn = document.querySelector('.pause-btn');
+        const resumebtn = document.querySelector('.resume-btn');
+        const resetbtn = document.querySelector('.reset-btn');
+
+        // 각 버튼에 이벤트 요소 추가
+        startbtn.addEventListener('click', starttimer);
+        pausebtn.addEventListener('click', pausetimer);
+        resumebtn.addEventListener('click', resumetimer);
+        resetbtn.addEventListener('click', resettimer);
+
+        // 시간 추가 함수
+        function addTime(minToAdd, secToAdd) {
+            // 입력 필드 값 가져오기
+            const minInput = document.querySelector('#minInput');
+            const secInput = document.querySelector('#secInput');
+
+            // 현재 값에 추가할 시간 더하기
+            let currentMin = parseInt(minInput.value) || 0;
+            let currentSec = parseInt(secInput.value) || 0;
+
+            // 초가 60 이상일 경우, 분으로 변환
+            currentSec += secToAdd;
+            if (currentSec >= 60) {
+                currentMin += Math.floor(currentSec / 60);
+                currentSec = currentSec % 60;
+            }
+
+            // 분 추가
+            currentMin += minToAdd;
+
+            minInput.value = currentMin;
+            secInput.value = currentSec;
+        }
+
+        // 타이머 함수 시작
+        function starttimer() {
+            if (isRunning) return;
+
+            const min = parseInt(document.querySelector('#minInput').value) || 0;
+            const sec = parseInt(document.querySelector('#secInput').value) || 0;
+
+            // 유효한 숫자가 입력되었는지 확인 (음수 or 0 처리)
+            if (min < 0 || sec < 0 || min == 0 && sec == 0) {
+                alert('유효한 시간을 입력하십시오');
+                return;
+            }
+
+            totalsec = min * 60 + sec;
+            remainsec = totalsec;
+            timeupdate();
+
+            updateTimeDisplay();
+            startProgressBar();
+
+            // 타이머 시작
+            IntervalID = setInterval(() => {
+
+                if (!isPause) {
+                    remainsec--;
+                    timeupdate();
+                    updateTimeDisplay();
+            updateProgressBar();
+                }
+                if (remainsec <= 0) {
+                    clearInterval(IntervalID); // 시간이 끝나면 타이머 중지
+                    alarm();
+                    document.querySelector('#timer-display').textContent = '종료'
+                    alert("타이머가 종료되었습니다!"); // 타이머 종료 메시지
+                }
+            }, 1000);
+        }
+
+        // 타이머 일시 정지
+        function pausetimer() {
+            isPause = true;
+        }
+
+        // 타이머 재시작
+        function resumetimer() {
+            isPause = false;
+        }
+
+        // 타이머 리셋
+        function resettimer() {
+            clearInterval(IntervalID);
+            totalsec = 0;
+            remainsec = 0;
+            isPause = false;
+            document.querySelector('#timer-display').textContent = '남은 시간 00 : 00 '
+            document.querySelector('#minInput').value = '';
+            document.querySelector('#secInput').value = '';
+            document.querySelector('#progress-bar').style.width = '0%';
+        }
+        //진행도
+        function updateProgressBar() {
+            const progress = ((totalSeconds - remainingSeconds) / totalSeconds) * 100;
+            document.querySelector('#progress-bar').style.width = progress + '%';
+        }
+        function startProgressBar() {
+            document.querySelector('#progress-bar').style.transitionDuration = totalSeconds + 's';
+        }
+        function formatTime(seconds) {
+            const minutes = Math.floor(seconds / 60);
+            const secs = seconds % 60;
+            return `${String(minutes).padStart(2, '0')} : ${String(secs).padStart(2, '0')}`;
+        }
+
+        // 남은 시간 업데이트
+        function timeupdate() {
+            const display_min = Math.floor(remainsec / 60).toString().padStart(2, '0');
+            const display_sec = (remainsec % 60).toString().padStart(2, '0');
+            const timerDisplay = document.querySelector('#timer-display');
+
+            document.querySelector('#timer-display').textContent = `남은 시간 ${display_min} : ${display_sec}`;
+
+            if (remainsec % 60 === 0 && remainsec !== totalsec) {
+                timerDisplay.classList.add('blink');  // 1분 단위로 점멸
+            } else if (remainsec % 30 === 0 && remainsec !== totalsec) {
+                // 30초 단위로 바뀔 때 점멸
+                timerDisplay.classList.add('blink');
+            } else {
+                timerDisplay.classList.remove('blink'); // 점멸 효과 제거
+            }
+
+            // 남은 시간이 10초 이하로 남았을 때 점멸
+            if (remainsec <= 10 && remainsec > 0) {
+                timerDisplay.classList.add('blink');
+            }
+
+            // 타이머가 종료되면 점멸 효과 제거
+            if (remainsec <= 0) {
+                timerDisplay.classList.remove('blink');
+            }
+        }
+
+        // 종료음 재생
+        function alarm() {
+            document.querySelector('#alarm').play();
+        }
+        //========================================================//
+        const bgColorInput = document.querySelector('#bgColor');
+        const btnColorInput = document.querySelector('#btnColor');
+
+        bgColorInput.addEventListener('input', function () {
+            document.body.style.backgroundColor = bgColorInput.value;
+        });
+
+        btnColorInput.addEventListener('input', function () {
+            document.querySelectorAll('button').forEach(button => {
+                button.style.backgroundColor = btnColorInput.value;
+            });
+        });
+        //========================================================//
+        // 타이머 진행 상태에 맞춰 애니메이션 실행
+        function startTimer() {
+
+            const progressBar = document.querySelector('.progress-bar');
+            progressBar.style.animationDuration = `${remainsec}s`;
+        }
+
+    </script>
+</body>
+
+</html>
