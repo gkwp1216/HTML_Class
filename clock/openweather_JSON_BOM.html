@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Open Weather</title>
+</head>
+<!-- 현재 위치의 지역을 나타내고, 현재 위치의 날씨를 위도-경도를 사용하여 나타내보자 -->
+<body>
+    <h1>현재 위치의 위도와 경도</h1>
+    <div id="weather">현재 위치 정보 불러오는 중 ... </div>
+
+    <script>
+        if(navigator.geolocation){
+            navigator.geolocation.getCurrentPosition(
+                position => {
+                const latitude = position.coords.latitude;
+                const longtitude = position.coords.longitude;
+                console.log('현재 위치의 위도 : ', letitude);
+                console.log('현재 위치의 경도 : ', longtitude);
+            }), 
+            (error) => {
+                console.log('위치 정보를 가져 올 수 없습니다.', error.message);
+            };
+        }
+        /*
+        <h1>현재 위치의 위도와 경도</h1>
+<div id="weather">현재 위치 정보 불러오는 중 ... </div>
+
+<script>
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+            position => {
+                const latitude = position.coords.latitude;  // 'letitude' -> 'latitude'로 수정
+                const longitude = position.coords.longitude;  // 'longtitude' -> 'longitude'로 수정
+                console.log('현재 위치의 위도 : ', latitude);
+                console.log('현재 위치의 경도 : ', longitude);
+
+                // 위치 정보를 화면에 표시
+                document.querySelector('#weather').innerHTML = `
+                    <p>현재 위치의 위도: ${latitude}</p>
+                    <p>현재 위치의 경도: ${longitude}</p>
+                `;
+            },
+            error => {
+                console.log('위치 정보를 가져올 수 없습니다.', error.message);
+                document.querySelector('#weather').innerHTML = '위치 정보를 가져오는 데 실패했습니다.';
+            }
+        );
+    } else {
+        console.log('이 브라우저는 Geolocation을 지원하지 않습니다.');
+        document.querySelector('#weather').innerHTML = 'Geolocation을 지원하지 않는 브라우저입니다.';
+    }
+        */
+</script>
+    
+        /*
+        function getWeather(cityName) {
+            const url = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=8d25e367749ae46c0ec92d16e57071ba&lang=kr&units=metric`
+
+            fetch(url) //then = 성공했을 때, catch = 실패했을 때, 'if, else 와 비슷한 듯 하다'
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('날씨 정보를 불러오지 못했습니다.');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // 날씨 데이터 가져오기
+                    const temperature = data.main.temp;  // 기온
+                    const description = data.weather[0].description;  // 날씨 설명
+                    const cityName = data.name;  // 도시명
+                    const humidity = data.main.humidity;  // 습도
+                    const windSpeed = data.wind.speed;  // 풍속
+
+                    // HTML에 날씨 정보 출력
+                    document.querySelector('#weather').innerHTML = `
+                        <p>도시: ${cityName}</p>
+                        <p>현재 온도: ${temperature}°C</p>
+                        <p>날씨: ${description}</p>
+                        <p>습도: ${humidity}%</p>
+                        <p>풍속: ${windSpeed} m/s</p>
+                    `;
+                })
+                .catch(error => {
+                    // 에러 처리
+                    document.querySelector('#weather').innerHTML = '날씨를 가져오는 도중 오류가 발생했습니다.';
+                    console.error('오류:', error);
+                });
+        }
+        function UpdateWeather() {
+            const city_input = document.querySelector('#city_input').value.trim();
+            const cityName = city_input || 'busan';
+            getWeather(cityName);
+        }
+        //이벤트 객체
+        document.querySelector('#city_input').addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                UpdateWeather()
+            }
+        });
+        // 페이지 로드 시 날씨 정보 자동으로 불러오기
+        UpdateWeather();
+    </script>*/
+</body>
+</html>

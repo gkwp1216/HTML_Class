@@ -9,11 +9,12 @@
 
 <body>
     <h1>현재 날씨</h1>
+    <input type="text" id="city_input" placeholder="도시명을 입력하세요(영어)">
     <div id="weather">날씨 정보 불러오는 중 ... </div>
 
     <script>
-        function getWeather() {
-            const url = 'https://api.openweathermap.org/data/2.5/weather?q=busan&appid=8d25e367749ae46c0ec92d16e57071ba&lang=kr&units=metric'
+        function getWeather(cityName) {
+            const url = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=8d25e367749ae46c0ec92d16e57071ba&lang=kr&units=metric`
 
             fetch(url) //then = 성공했을 때, catch = 실패했을 때, 'if, else 와 비슷한 듯 하다'
                 .then(response => {
@@ -45,10 +46,19 @@
                     console.error('오류:', error);
                 });
         }
-
+        function UpdateWeather() {
+            const city_input = document.querySelector('#city_input').value.trim();
+            const cityName = city_input || 'busan';
+            getWeather(cityName);
+        }
+        //이벤트 객체
+        document.querySelector('#city_input').addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                UpdateWeather()
+            }
+        });
         // 페이지 로드 시 날씨 정보 자동으로 불러오기
-        getWeather();
+        UpdateWeather();
     </script>
 </body>
-
 </html>
