@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Open Weather</title>
+</head>
+
+<body>
+    <h1>현재 날씨</h1>
+    <input type="text" id="city_input" placeholder="도시명을 입력하세요(영어)">
+    <div id="weather">날씨 정보 불러오는 중 ... </div>
+
+    <script>
+        function getWeather(cityName) {
+            const url = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=8d25e367749ae46c0ec92d16e57071ba&lang=kr&units=metric`
+
+            fetch(url) //then = 성공했을 때, catch = 실패했을 때, 'if, else 와 비슷한 듯 하다'
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('날씨 정보를 불러오지 못했습니다.');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // 날씨 데이터 가져오기
+                    const weather_icon = data.weather[0].icon;
+                    const weather_icon_URL = `https://openweathermap.org/img/wn/${weather_icon}@2x.png`;
+                    const temperature = data.main.temp;  // 기온
+                    const description = data.weather[0].description;  // 날씨 설명
+                    const cityName = data.name;  // 도시명
+                    const humidity = data.main.humidity;  // 습도
+                    const windSpeed = data.wind.speed;  // 풍속
+
+                    // HTML에 날씨 정보 출력
+                    document.querySelector('#weather').innerHTML = `
+                        <img src="${weather_icon_URL}" alt="${description}">
+                        <p>도시: ${cityName}</p>
+                        <p>현재 온도: ${temperature}°C</p>
+                        <p>날씨: ${description}</p>
+                        <p>습도: ${humidity}%</p>
+                        <p>풍속: ${windSpeed} m/s</p>
+                    `;
+                })
+                .catch(error => {
+                    // 에러 처리
+                    document.querySelector('#weather').innerHTML = '날씨를 가져오는 도중 오류가 발생했습니다.';
+                    console.error('오류:', error);
+                });
+        }
+        function UpdateWeather() {
+            const city_input = document.querySelector('#city_input').value.trim();
+            const cityName = city_input || 'busan';
+            getWeather(cityName);
+        }
+        //이벤트 객체
+        document.querySelector('#city_input').addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                UpdateWeather()
+            }
+        });
+        // 페이지 로드 시 날씨 정보 자동으로 불러오기
+        UpdateWeather();
+    </script>
+</body>
+</html>

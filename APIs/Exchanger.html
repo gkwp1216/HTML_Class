@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>환율 계산기</title>
+</head>
+<body>
+    <div class="container">
+        <h1>환율 계산기</h1>
+        <input type="number" id="amount" placeholder="금액 입력" min="0">
+        <select id="from_currency">
+            <option value="USD">USD(달러)</option>
+            <option value="KRW">KRW(원)</option>
+            <option value="JPY">JPY(엔)</option>
+            <option value="CNY">CNY(위안)</option>
+            <option value="EUR">EUR(유로)</option>
+        </select>
+        <select id="to_currency">
+            <option value="USD">USD(달러)</option>
+            <option value="KRW">KRW(원)</option>
+            <option value="JPY">JPY(엔)</option>
+            <option value="CNY">CNY(위안)</option>
+            <option value="EUR">EUR(유로)</option>
+        </select>
+        <button id="convert_currency">변환</button>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const currency_names = {
+            USD : '달러',
+            KRW : '원',
+            JPY : '엔',
+            CNY : '위안',
+            EUR : '유로'
+        }
+        const convert_currency_btn = document.querySelector('#convert_currency');
+        convert_currency_btn.addEventListener('click' ,convert_currency)
+        
+
+        function convert_currency(){
+            const amount = parseFloat(document.querySelector('#amount').value);
+            const from_currency = document.querySelector('#from_currency').value;
+            const to_currency = document.querySelector('#to_currency').value;
+            const result_element = document.querySelector('#result');
+
+            
+            if(!amount || from_currency === to_currency){
+                document.querySelector('#result').textContent = '올바른 금액 및 단위를 입력해주세요';
+                return;
+            }
+
+            const api_key = '36a13348489380bda1c6d426';
+            const url = `https://v6.exchangerate-api.com/v6/${api_key}/latest/${from_currency}`;
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if(data.result === 'success'){
+                        const rate = data.conversion_rates[to_currency];
+                        const converted_amount = amount * rate;
+                        const from_currency_name = currency_names[from_currency];
+                        const to_currency_name = currency_names[to_currency];
+                        document.querySelector('#result').textContent = `${amount} ${from_currency_name} = ${converted_amount.toFixed(2)} ${to_currency_name}`
+                    }
+                    else {
+                        document.querySelector('#result').textContent = '환율 정보를 가져오는 데 실패했습니다'
+                    }
+                })
+                .catch(error => {
+                    document.querySelector('#result').textContent = '오류가 발생했습니다' + error.message;
+                })
+
+             
+            document.addEventListener('keydown',function(e){
+                if(e.key === 'Enter'){
+                    
+                    //result_element.textContent = `${amount}'에서 ${to_currency}`
+                }
+            })
+        }
+        //function
+    </script>
+</body>
+</html>

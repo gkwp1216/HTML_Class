@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Open Weather</title>
+    <style>
+        body {
+            background-color: #ffe6f0; 
+            font-family: 'Arial', sans-serif;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            height: 100vh;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            color: #ff5c8d; /* 약간 진한 핑크 */
+            font-size: 2.5em;
+            margin-top: 40px; /* 위쪽 여백을 추가하여 잘리는 문제 해결 */
+            margin-bottom: 10px;
+        }
+
+        /* 날짜와 시간 표시 */
+        #date-time {
+            font-size: 1.2em;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        /* 입력창 디자인 */
+        input[type="text"] {
+            padding: 10px;
+            margin: 10px;
+            width: 250px;
+            border: 2px solid #ff5c8d;
+            border-radius: 20px;
+            font-size: 1em;
+            outline: none;
+            transition: 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            border-color: #ff4d7a; /* 포커스 시 색상 */
+            box-shadow: 0 0 10px rgba(255, 92, 141, 0.5);
+        }
+
+        /* 날씨 정보 박스 스타일 */
+        #weather {
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            margin: 20px;
+            width: 300px;
+            text-align: center;
+        }
+
+        #weather img {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 10px;
+        }
+
+        /* 5일치 일기 예보 가로로 정렬 */
+        #forecast {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: nowrap;
+            gap: 20px;
+            padding: 20px;
+            margin-top: 20px;
+            width: 90%;
+            max-width: 1200px;
+            box-sizing: border-box;
+            overflow-x: auto; /* 가로 스크롤 가능하도록 설정 */
+        }
+
+        #forecast > div {
+            background-color: #ffffff;
+            border-radius: 10px;
+            padding: 15px;
+            width: 18%; /* 카드의 너비를 18%로 설정 */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            min-width: 150px; /* 최소 너비 설정 */
+        }
+
+        #forecast > div:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        #forecast img {
+            width: 50px;
+            height: 50px;
+        }
+
+        /* 작은 화면에서 예보 항목을 세로로 나열 */
+        @media (max-width: 768px) {
+            #forecast {
+                flex-direction: row;
+                overflow-x: scroll; /* 스크롤 가능하게 설정 */
+            }
+
+            #forecast > div {
+                width: 80%;
+                margin-bottom: 20px;
+            }
+        }
+
+        /* 오류 메시지 스타일 */
+        #weather, #forecast {
+            font-size: 1.1em;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>현재 날씨 & 5일 일기 예보</h1>
+    <!-- 날짜와 시간을 표시할 곳 -->
+    <div id="date-time"></div>
+    <input type="text" id="city_input" placeholder="도시명을 입력하세요(영어)">
+    <div id="weather">날씨 정보 불러오는 중 ... </div>
+    <div id="forecast">5일 뒤 일기 예보 불러오는 중 ... </div>
+
+    <script>
+        // 날짜와 시간을 표시하는 함수
+        function displayDateTime() {
+            const now = new Date();
+            const date = now.toLocaleDateString('ko-KR');
+            const time = now.toLocaleTimeString('ko-KR');
+            document.querySelector('#date-time').innerHTML = `오늘은 ${date}, 현재 시간은 ${time}입니다.`;
+        }
+
+        // 날씨 정보 불러오기
+        function getWeather(cityName) {
+            const url = `https://api.openweathermap.org/data/2.5/weather?q=${cityName}&appid=8d25e367749ae46c0ec92d16e57071ba&lang=kr&units=metric`
+
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('날씨 정보를 불러오지 못했습니다.');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const weather_icon = data.weather[0].icon;
+                    const weather_icon_URL = `https://openweathermap.org/img/wn/${weather_icon}@2x.png`;
+                    const temperature = data.main.temp;
+                    const description = data.weather[0].description;
+                    const cityName = data.name;
+                    const humidity = data.main.humidity;
+                    const windSpeed = data.wind.speed;
+
+                    document.querySelector('#weather').innerHTML = `
+                        <img src="${weather_icon_URL}" alt="${description}">
+                        <p>도시: ${cityName}</p>
+                        <p>현재 온도: ${temperature}°C</p>
+                        <p>날씨: ${description}</p>
+                        <p>습도: ${humidity}%</p>
+                        <p>풍속: ${windSpeed} m/s</p>
+                    `;
+                })
+                .catch(error => {
+                    document.querySelector('#weather').innerHTML = '날씨를 가져오는 도중 오류가 발생했습니다.';
+                    console.error('오류:', error);
+                });
+        }
+
+        // 5일 일기 예보 불러오기
+        function getForecast(cityName) {
+            const url = `https://api.openweathermap.org/data/2.5/forecast?q=${cityName}&appid=8d25e367749ae46c0ec92d16e57071ba&lang=kr&units=metric`
+
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('일기 예보 정보를 불러오지 못했습니다.');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const forecast = data.list.filter(item => item.dt_txt.includes('12:00:00')); // 12시 예보만 추출
+                    let forecastHTML = '';
+
+                    forecast.forEach(item => {
+                        const date = new Date(item.dt * 1000);
+                        const dateString = date.toLocaleDateString('ko-KR');
+                        const weather_icon = item.weather[0].icon;
+                        const weather_icon_URL = `https://openweathermap.org/img/wn/${weather_icon}@2x.png`;
+                        const temperature = item.main.temp;
+                        const description = item.weather[0].description;
+
+                        forecastHTML += `
+                            <div>
+                                <p>${dateString}</p>
+                                <img src="${weather_icon_URL}" alt="${description}">
+                                <p>${temperature}°C</p>
+                                <p>${description}</p>
+                            </div>
+                        `;
+                    });
+
+                    document.querySelector('#forecast').innerHTML = forecastHTML;
+                })
+                .catch(error => {
+                    document.querySelector('#forecast').innerHTML = '일기 예보를 가져오는 도중 오류가 발생했습니다.';
+                    console.error('오류:', error);
+                });
+        }
+
+        function UpdateWeather() {
+            const city_input = document.querySelector('#city_input').value.trim();
+            const cityName = city_input || 'busan';
+            getWeather(cityName);
+            getForecast(cityName);
+        }
+
+        document.querySelector('#city_input').addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                UpdateWeather()
+            }
+        });
+
+        // 페이지 로드 시 날씨 정보 자동으로 불러오기
+        UpdateWeather();
+        
+        // 페이지 로드 시 날짜와 시간 자동으로 업데이트
+        displayDateTime();
+        setInterval(displayDateTime, 1000); // 1초마다 날짜와 시간을 업데이트
+    </script>
+</body>
+
+</html>
