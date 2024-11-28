@@ -1,0 +1,9 @@
+API 키
+AIzaSyDekwA8pod6enXtP-ZIYf5BBod5kHQzJ5s
+
+구글 클라우드
+https://console.cloud.google.com/google/maps-apis/credentials?inv=1&invt=Abiqag&project=burnished-yeti-443104-e8
+
+구글 맵스 플랫폼
+https://developers.google.com/maps/documentation/javascript/add-google-map?hl=ko&_gl=1*989r7x*_up*MQ..*_ga*Mzg5NDE4NDUwLjE3MzI3NjkyNzg.*_ga_NRWSTWS78N*MTczMjc2OTI3OC4xLjEuMTczMjc3MDc3Ny4wLjAuMA..#maps_map_simple-html
+
